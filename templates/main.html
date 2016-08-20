@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="{{ static_url('css/materialicons.css') }}" rel="stylesheet"/>
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/materialize.min.css') }}" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/style.css') }}" media="screen,projection"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body>
+
+<div class="container">
+    <h3>AdaGram</h3>
+    <form action="/" method="get">
+        <input title="word" placeholder="Type a word and press Enter"
+               type="text" autofocus="autofocus"
+               name="word" value="{{ word or ''}}"/>
+    </form>
+
+    {% if word %}
+        {% if not senses %}
+            Word "{{ word }}" not found.
+        {% else %}
+            {% for idx, sense in enumerate(senses, 1) %}
+                <div>
+                    <h5>Sense #{{ idx }}: {{ '{:.2f}'.format(sense['prob']) }}</h5>
+                    <ul class="collection">
+                        {% for w, w_sense, w_prob in sense['neighbours'] %}
+                            <li class="collection-item">
+                                {{ w }}: {{ '{:.2f}'.format(w_prob) }}
+                            </li>
+                        {% end %}
+                    </ul>
+                </div>
+            {% end %}
+        {% end %}
+    {% end %}
+</div>
+
+<script type="text/javascript" src="{{ static_url('js/jquery-2.1.1.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/materialize.min.js') }}"></script>
+
+</body>
+</html>
+
