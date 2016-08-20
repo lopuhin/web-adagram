@@ -22,12 +22,19 @@
             Word "{{ word }}" not found.
         {% else %}
             {% for idx, sense in enumerate(senses, 1) %}
-                <div>
-                    <h5>Sense #{{ idx }}: {{ '{:.2f}'.format(sense['prob']) }}</h5>
+                <div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
+                    <h5>Sense #{{ idx }}
+                        <span class="sense-prob">
+                             {{ '{:.2f}'.format(sense['prob']) }}
+                        </span>
+                    </h5>
                     <ul class="collection">
-                        {% for w, w_sense, w_prob in sense['neighbours'] %}
+                        {% for n in sense['neighbors'] %}
                             <li class="collection-item">
-                                {{ w }}: {{ '{:.2f}'.format(w_prob) }}
+                                <a href="{{ n['link'] }}">{{ n['word'] }}</a>
+                                <span class="closeness">
+                                    {{ '{:.2f}'.format(n['closeness']) }}
+                                </span>
                             </li>
                         {% end %}
                     </ul>

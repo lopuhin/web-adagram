@@ -2,6 +2,7 @@
 import argparse
 import logging
 from pathlib import Path
+from urllib.parse import urlencode
 
 import tornado.ioloop
 from tornado.web import Application, RequestHandler, URLSpec
@@ -17,6 +18,9 @@ STATIC_ROOT = ROOT / 'static'
 class MainHandler(RequestHandler):
     def get(self):
         word = self.get_argument('word', None)
+        sense_idx = self.get_argument('sense', None)
+        if sense_idx is not None:
+            sense_idx = int(sense_idx)
         senses = []
         if word is not None:
             vm = self.application.settings['adagram_model']
@@ -26,8 +30,19 @@ class MainHandler(RequestHandler):
                 pass
             else:
                 for idx, prob in enumerate(sense_probs):
-                    neighbours = vm.sense_neighbors(word, idx)
-                    senses.append({'prob': prob, 'neighbours': neighbours})
+                    neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
+                    senses.append({
+                        'prob': prob,
+                        'highlight': idx == sense_idx,
+                        'neighbors': [
+                            {'word': w,
+                             'link': '{}?{}'.format(
+                                 self.reverse_url('main'),
+                                 urlencode({'word': w, 'sense': s_idx})),
+                             'closeness': closeness}
+                            for w, s_idx, closeness in neighbours],
+                    })
+                senses.sort(key=lambda s: s['prob'], reverse=True)
         self.render('templates/main.html', word=word, senses=senses)
 
 

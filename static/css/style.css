@@ -1,0 +1,14 @@
+.sense-card {
+    display: inline-block;
+    padding: 1em;
+    margin: 1em;
+}
+
+.sense-card.highlight {
+    background: lightgoldenrodyellow;
+}
+
+.closeness, .sense-prob {
+    margin-left: 1em;
+    float: right;
+}
