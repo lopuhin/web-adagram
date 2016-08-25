@@ -32,6 +32,7 @@ class MainHandler(RequestHandler):
                 for idx, prob in enumerate(sense_probs):
                     neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
                     senses.append({
+                        'idx': idx,
                         'prob': prob,
                         'highlight': idx == sense_idx,
                         'neighbors': [

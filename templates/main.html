@@ -21,9 +21,9 @@
         {% if not senses %}
             Word "{{ word }}" not found.
         {% else %}
-            {% for idx, sense in enumerate(senses, 1) %}
+            {% for sense in senses %}
                 <div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
-                    <h5>Sense #{{ idx }}
+                    <h5>#{{ sense['idx'] }}
                         <span class="sense-prob">
                              {{ '{:.2f}'.format(sense['prob']) }}
                         </span>
