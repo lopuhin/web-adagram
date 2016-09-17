@@ -5,6 +5,7 @@
     <link type="text/css" rel="stylesheet" href="{{ static_url('css/materialize.min.css') }}" media="screen,projection"/>
     <link type="text/css" rel="stylesheet" href="{{ static_url('css/style.css') }}" media="screen,projection"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WSI{% if word %}: {{ word }}{% end %}</title>
 </head>
 
 <body>
@@ -21,6 +22,9 @@
         {% if not senses %}
             Word "{{ word }}" not found.
         {% else %}
+            <div class="word-info">
+                Word ipm: {{ "{:.2f}".format(ipm) }}, occurrences: {{ freq }}.
+            </div>
             {% for sense in senses %}
                 <div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
                     <h5>#{{ sense['idx'] }}

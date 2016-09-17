@@ -21,7 +21,7 @@ class MainHandler(RequestHandler):
         sense_idx = self.get_argument('sense', None)
         if sense_idx is not None:
             sense_idx = int(sense_idx)
-        senses = []
+        ctx = {'word': word, 'senses': None}
         if word is not None:
             vm = self.application\
                 .settings['adagram_model']  # type: adagram.VectorModel
@@ -30,22 +30,30 @@ class MainHandler(RequestHandler):
             except KeyError:
                 pass
             else:
-                for idx, prob in enumerate(sense_probs):
-                    neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
-                    senses.append({
-                        'idx': idx,
-                        'prob': prob,
-                        'highlight': idx == sense_idx,
-                        'neighbors': [
-                            {'word': w,
-                             'link': '{}?{}'.format(
-                                 self.reverse_url('main'),
-                                 urlencode({'word': w, 'sense': s_idx})),
-                             'closeness': closeness}
-                            for w, s_idx, closeness in neighbours],
-                    })
-                senses.sort(key=lambda s: s['prob'], reverse=True)
-        self.render('templates/main.html', word=word, senses=senses)
+                ctx['senses'] = self.senses(vm, word, sense_probs, sense_idx)
+                word_id = vm.dictionary.word2id[word]
+                ctx['freq'] = freq = vm.frequencies[word_id]
+                ctx['ipm'] = freq / vm.frequencies.sum() * 1e6
+        self.render('templates/main.html', **ctx)
+
+    def senses(self, vm, word, sense_probs, sense_idx):
+        senses = []
+        for idx, prob in enumerate(sense_probs):
+            neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
+            senses.append({
+                'idx': idx,
+                'prob': prob,
+                'highlight': idx == sense_idx,
+                'neighbors': [
+                    {'word': w,
+                     'link': '{}?{}'.format(
+                         self.reverse_url('main'),
+                         urlencode({'word': w, 'sense': s_idx})),
+                     'closeness': closeness}
+                    for w, s_idx, closeness in neighbours],
+            })
+        senses.sort(key=lambda s: s['prob'], reverse=True)
+        return senses
 
 
 def main():
