@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}WSI{% if word %}: {{ word }} {{ sense_1 }} ↔ {{ sense_2 }}{% end %}{% end %}
+
+{% block content %}
+
+    <h3>Sense delta similarity</h3>
+
+    <form action="{{ reverse_url('sim-delta') }}" method="get">
+        <input style="width: 55%"
+               title="word" placeholder="Word"
+               required="required"
+               type="text" name="word" value="{{ word or ''}}"/>
+        <input style="width: 20%"
+               required="required"
+               type="number" name="s1" value="{{ sense_1 }}" placeholder="Sense 1"/>
+        <input style="width: 20%"
+               required="required"
+               type="number" name="s2" value="{{ sense_2 }}" placeholder="Sense 2"/>
+        <input type="submit" value="Go" class="waves-effect waves-light btn"/>
+    </form>
+
+    {% if word %}
+
+        <h4>{{ word }}: {{ sense_1 }} ↔ {{ sense_2 }}</h4>
+
+        {% if not senses %}
+            Word "{{ word }}" not found.
+        {% else %}
+            <div class="word-info">
+                Word ipm: {{ "{:.2f}".format(ipm) }}, occurrences: {{ freq }}.
+            </div>
+            {% for sense in senses %}
+                <div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
+                    <h5>#{{ sense['idx'] }}
+                        <span class="sense-prob">
+                            {{ '{:.2f}'.format(sense['prob']) }}
+                        </span>
+                    </h5>
+                    <ul class="collection">
+                        {% for n in sense['neighbors'] %}
+                            <li class="collection-item">
+                                {{ n['word'] }}
+                                <span class="closeness">
+                                    {{ '{:.2f}'.format(n['closeness']) }}
+                                </span>
+                            </li>
+                        {% end %}
+                    </ul>
+                </div>
+            {% end %}
+
+            <h4>Similar pairs</h4>
+            <table>
+                <tr>
+                    <th>Word</th>
+                    <th>Sense 1</th>
+                    <th>Sense 2</th>
+                    <th>Closeness</th>
+                </tr>
+                {% for w, s1, s2, sim in similar_pairs %}
+                <tr>
+                    <th><a target="_blank"
+                           href="{{ reverse_url('main') }}?word={{ w }}&highlight={{ s1 }}&highlight={{ s2 }}">
+                        {{ w }}</a></th>
+                    <td>{{ s1 }}</td>
+                    <td>{{ s2 }}</td>
+                    <td>{{ '{:.2f}'.format(sim) }}</td>
+                </tr>
+                {% end %}
+            </table>
+        {% end %}
+    {% end %}
+{% end %}

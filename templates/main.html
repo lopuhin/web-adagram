@@ -4,7 +4,7 @@
 
 {% block content %}
     <h3>AdaGram</h3>
-    <form action="/" method="get">
+    <form action="{{ reverse_url('main') }}" method="get">
         <input title="word" placeholder="Type a word and press Enter"
                type="text" autofocus="autofocus"
                name="word" value="{{ word or ''}}"/>
