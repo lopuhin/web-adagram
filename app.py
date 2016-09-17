@@ -23,9 +23,10 @@ class MainHandler(RequestHandler):
             sense_idx = int(sense_idx)
         senses = []
         if word is not None:
-            vm = self.application.settings['adagram_model']
+            vm = self.application\
+                .settings['adagram_model']  # type: adagram.VectorModel
             try:
-                sense_probs = vm.sense_probs(word)
+                sense_probs = vm.word_sense_probs(word)
             except KeyError:
                 pass
             else:
