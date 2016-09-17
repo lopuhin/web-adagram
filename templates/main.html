@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="{{ static_url('css/materialicons.css') }}" rel="stylesheet"/>
-    <link type="text/css" rel="stylesheet" href="{{ static_url('css/materialize.min.css') }}" media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="{{ static_url('css/style.css') }}" media="screen,projection"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>WSI{% if word %}: {{ word }}{% end %}</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}WSI{% if word %}: {{ word }}{% end %}{% end %}
 
-<div class="container">
+{% block content %}
     <h3>AdaGram</h3>
     <form action="/" method="get">
         <input title="word" placeholder="Type a word and press Enter"
@@ -46,11 +38,4 @@
             {% end %}
         {% end %}
     {% end %}
-</div>
-
-<script type="text/javascript" src="{{ static_url('js/jquery-2.1.1.min.js') }}"></script>
-<script type="text/javascript" src="{{ static_url('js/materialize.min.js') }}"></script>
-
-</body>
-</html>
-
+{% end %}
