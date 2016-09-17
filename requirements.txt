@@ -1,4 +1,4 @@
-Cython==0.21
-numpy==1.10.4
-six==1.10.0
-tornado==4.2
+Cython==0.24.1
+numpy==1.11.1
+six
+tornado==4.4.1
