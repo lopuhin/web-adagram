@@ -38,6 +38,7 @@ class MainHandler(RequestHandler):
 
     def senses(self, vm, word, sense_probs, highlight):
         senses = []
+        collocates = dict(vm.word_sense_collocates(word, limit=5))
         for idx, prob in enumerate(sense_probs):
             neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
             senses.append({
@@ -51,6 +52,7 @@ class MainHandler(RequestHandler):
                          urlencode({'word': w, 'highlight': s_idx})),
                      'closeness': closeness}
                     for w, s_idx, closeness in neighbours],
+                'collocates': collocates.get(idx, []),
             })
         senses.sort(key=lambda s: s['prob'], reverse=True)
         return senses

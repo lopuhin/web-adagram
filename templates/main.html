@@ -24,6 +24,7 @@
                              {{ '{:.2f}'.format(sense['prob']) }}
                         </span>
                     </h5>
+                    {{ ', '.join(sense['collocates']) }}
                     <ul class="collection">
                         {% for n in sense['neighbors'] %}
                             <li class="collection-item">
