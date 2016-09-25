@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import numpy as np
 from numpy.linalg import norm
 from tornado.web import RequestHandler
@@ -28,8 +30,10 @@ class SimDeltaHandler(RequestHandler):
                 word_id = vm.dictionary.word2id[word]
                 ctx['freq'] = freq = vm.frequencies[word_id]
                 ctx['ipm'] = freq / vm.frequencies.sum() * 1e6
-                ctx['similar_pairs'] = self.find_similar_pairs(
-                    vm, word, s1, s2)[:20]
+                ctx['similarity'] = np.dot(
+                    vm.sense_vector(word, s1, normalized=True),
+                    vm.sense_vector(word, s2, normalized=True))
+                ctx['similar_pairs'] = self.find_similar_pairs(vm, word, s1, s2)
         self.render('templates/sim-delta.html', **ctx)
 
     def senses(self, vm, word, sense_probs, sense_ids):
@@ -48,23 +52,14 @@ class SimDeltaHandler(RequestHandler):
         return senses
 
     def find_similar_pairs(self, vm, word, sense_1, sense_2):
-        word_id = vm.dictionary.word2id[word]
-        w_freq = vm.dictionary.frequencies[word_id]
-        frequent_ids = [w_id for w_id, freq in
-                        enumerate(vm.dictionary.frequencies)
-                        if freq * 10 >= w_freq]
-        frequent_words = [vm.dictionary.id2word[w_id] for w_id in frequent_ids]
-        pairs = lambda lst: ((x, y) for x in lst for y in lst if x != y)
-        sense_pairs = [
-            (w, s1, s2, vm.In[w_id, s1] - vm.In[w_id, s2])
-            for w, w_id in zip(frequent_words, frequent_ids)
-            for s1, s2 in pairs(
-                [s for s, prob in enumerate(vm.word_sense_probs(w))
-                 if prob > 0.01])
-            ]
-        d_vec = vm.sense_vector(word, sense_1) - vm.sense_vector(word, sense_2)
-        d_vec_norm = norm(d_vec)
-        cos_sims = [(w, s1, s2, np.dot(d_vec, dv) / (norm(dv) * d_vec_norm))
-                    for w, s1, s2, dv in sense_pairs]
-        cos_sims.sort(key=lambda x: x[-1], reverse=True)
-        return cos_sims
+        by_word = defaultdict(lambda : ([], []))
+        for idx, sense in enumerate([sense_1, sense_2]):
+            for w, s, sim in vm.sense_neighbors(
+                    word, sense, max_neighbors=5000, min_closeness=0.35):
+                by_word[w][idx].append((s, sim))
+        pairs = [(word, s1, s2, min(sim1, sim2))
+                 for word, (s1_sim, s2_sim) in by_word.items()
+                 for s1, sim1 in s1_sim
+                 for s2, sim2 in s2_sim]
+        pairs.sort(key=lambda x: x[-1], reverse=True)
+        return pairs[:30]

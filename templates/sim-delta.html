@@ -28,6 +28,7 @@
             Word "{{ word }}" not found.
         {% else %}
             <div class="word-info">
+               {{ sense_1 }} ↔ {{ sense_2 }} similarity: {{ '{:.2f}'.format(similarity) }}<br/>
                 Word ipm: {{ "{:.2f}".format(ipm) }}, occurrences: {{ freq }}.
             </div>
             {% for sense in senses %}
