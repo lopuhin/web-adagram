@@ -32,23 +32,7 @@
                 Word ipm: {{ "{:.2f}".format(ipm) }}, occurrences: {{ freq }}.
             </div>
             {% for sense in senses %}
-                <div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
-                    <h5>#{{ sense['idx'] }}
-                        <span class="sense-prob">
-                            {{ '{:.2f}'.format(sense['prob']) }}
-                        </span>
-                    </h5>
-                    <ul class="collection">
-                        {% for n in sense['neighbors'] %}
-                            <li class="collection-item">
-                                {{ n['word'] }}
-                                <span class="closeness">
-                                    {{ '{:.2f}'.format(n['closeness']) }}
-                                </span>
-                            </li>
-                        {% end %}
-                    </ul>
-                </div>
+                {% include "_sense_card.html" %}
             {% end %}
 
             <h4>Similar pairs</h4>
@@ -62,7 +46,7 @@
                 {% for w, s1, s2, sim in similar_pairs %}
                 <tr>
                     <th><a target="_blank"
-                           href="{{ reverse_url('main') }}?word={{ w }}&highlight={{ s1 }}&highlight={{ s2 }}">
+                           href="{{ reverse_url('senses') }}?word={{ w }}&highlight={{ s1 }}&highlight={{ s2 }}">
                         {{ w }}</a></th>
                     <td>{{ s1 }}</td>
                     <td>{{ s2 }}</td>

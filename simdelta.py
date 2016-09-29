@@ -1,13 +1,12 @@
 from collections import defaultdict
 
-import numpy as np
-from numpy.linalg import norm
-from tornado.web import RequestHandler
-
 import adagram
+import numpy as np
+
+from senses import SensesHandler
 
 
-class SimDeltaHandler(RequestHandler):
+class SimDeltaHandler(SensesHandler):
     def get(self):
         word = self.get_argument('word', None)
         s1 = self.get_argument('s1', '')
@@ -35,21 +34,6 @@ class SimDeltaHandler(RequestHandler):
                     vm.sense_vector(word, s2, normalized=True))
                 ctx['similar_pairs'] = self.find_similar_pairs(vm, word, s1, s2)
         self.render('templates/sim-delta.html', **ctx)
-
-    def senses(self, vm, word, sense_probs, sense_ids):
-        senses = []
-        for idx, prob in enumerate(sense_probs):
-            neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
-            senses.append({
-                'idx': idx,
-                'prob': prob,
-                'highlight': idx in sense_ids,
-                'neighbors': [
-                    {'word': w, 'closeness': closeness}
-                    for w, s_idx, closeness in neighbours],
-            })
-        senses.sort(key=lambda s: s['prob'], reverse=True)
-        return senses
 
     def find_similar_pairs(self, vm, word, sense_1, sense_2):
         by_word = defaultdict(lambda : ([], []))

@@ -1,0 +1,18 @@
+<div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
+    <h5>#{{ sense['idx'] }}
+        <span class="sense-prob">
+                             {{ '{:.2f}'.format(sense['prob']) }}
+                        </span>
+    </h5>
+    {{ ', '.join(sense['collocates']) }}
+    <ul class="collection">
+        {% for n in sense['neighbors'] %}
+        <li class="collection-item">
+            <a href="{{ n['link'] }}">{{ n['word'] }}</a>
+            <span class="closeness">
+                                    {{ '{:.2f}'.format(n['closeness']) }}
+                                </span>
+        </li>
+        {% end %}
+    </ul>
+</div>

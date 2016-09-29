@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}WSI{% if word %}: {{ word }}{% end %}{% end %}
+
+{% block content %}
+    <h3>AdaGram</h3>
+    <form action="{{ reverse_url('senses') }}" method="get">
+        <input title="word" placeholder="Type a word and press Enter"
+               type="text" autofocus="autofocus"
+               name="word" value="{{ word or ''}}"/>
+    </form>
+
+    {% if word %}
+        {% if not senses %}
+            Word "{{ word }}" not found.
+        {% else %}
+            <div class="word-info">
+                Word ipm: {{ "{:.2f}".format(ipm) }}, occurrences: {{ freq }}.
+            </div>
+            {% for sense in senses %}
+                {% include "_sense_card.html" %}
+            {% end %}
+        {% end %}
+    {% end %}
+{% end %}
