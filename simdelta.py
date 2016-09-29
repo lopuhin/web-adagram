@@ -60,6 +60,7 @@ class SimDeltaHandler(RequestHandler):
         pairs = [(word, s1, s2, min(sim1, sim2))
                  for word, (s1_sim, s2_sim) in by_word.items()
                  for s1, sim1 in s1_sim
-                 for s2, sim2 in s2_sim]
+                 for s2, sim2 in s2_sim
+                 if s1 != s2]
         pairs.sort(key=lambda x: x[-1], reverse=True)
         return pairs[:30]
