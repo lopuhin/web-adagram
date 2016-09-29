@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 import adagram
-from tornado.web import Application, RequestHandler, URLSpec
+from tornado.web import RequestHandler
 
 
 class SensesHandler(RequestHandler):
@@ -26,7 +26,7 @@ class SensesHandler(RequestHandler):
     def senses(self, vm, word, sense_probs, highlight):
         senses = []
         collocates = dict(vm.word_sense_collocates(word, limit=5))
-        for idx, prob in enumerate(sense_probs):
+        for idx, prob in sense_probs:
             neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
             senses.append({
                 'idx': idx,
