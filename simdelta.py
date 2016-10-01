@@ -32,19 +32,20 @@ class SimDeltaHandler(SensesHandler):
                 ctx['similarity'] = np.dot(
                     vm.sense_vector(word, s1, normalized=True),
                     vm.sense_vector(word, s2, normalized=True))
-                ctx['similar_pairs'] = self.find_similar_pairs(vm, word, s1, s2)
+                ctx['similar_pairs'] = find_similar_pairs(vm, word, s1, s2)[:30]
         self.render('templates/sim-delta.html', **ctx)
 
-    def find_similar_pairs(self, vm, word, sense_1, sense_2):
-        by_word = defaultdict(lambda : ([], []))
-        for idx, sense in enumerate([sense_1, sense_2]):
-            for w, s, sim in vm.sense_neighbors(
-                    word, sense, max_neighbors=5000, min_closeness=0.35):
-                by_word[w][idx].append((s, sim))
-        pairs = [(word, s1, s2, min(sim1, sim2))
-                 for word, (s1_sim, s2_sim) in by_word.items()
-                 for s1, sim1 in s1_sim
-                 for s2, sim2 in s2_sim
-                 if s1 != s2]
-        pairs.sort(key=lambda x: x[-1], reverse=True)
-        return pairs[:30]
+
+def find_similar_pairs(vm, word, sense_1, sense_2):
+    by_word = defaultdict(lambda : ([], []))
+    for idx, sense in enumerate([sense_1, sense_2]):
+        for w, s, sim in vm.sense_neighbors(
+                word, sense, max_neighbors=5000, min_closeness=0.35):
+            by_word[w][idx].append((s, sim))
+    pairs = [(word, s1, s2, min(sim1, sim2))
+             for word, (s1_sim, s2_sim) in by_word.items()
+             for s1, sim1 in s1_sim
+             for s2, sim2 in s2_sim
+             if s1 != s2]
+    pairs.sort(key=lambda x: x[-1], reverse=True)
+    return pairs
