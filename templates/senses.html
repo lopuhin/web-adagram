@@ -3,6 +3,9 @@
 {% block title %}WSI{% if word %}: {{ word }}{% end %}{% end %}
 
 {% block content %}
+
+    <div id="about"><a href="{{ reverse_url('about') }}">About</a></div>
+
     <h3>AdaGram</h3>
     <form action="{{ reverse_url('senses') }}" method="get">
         <input title="word" placeholder="Type a word and press Enter"

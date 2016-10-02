@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}About{% end %}
+
+{% block content %}
+<h3>About</h3>
+
+<p>
+    This is a demo of the AdaGram
+    (<a target="_blank" href="http://arxiv.org/abs/1502.07257">Bartunov et al., 2015</a>) method,
+    and a regular polysemy pattern explorer.
+</p>
+
+<p>
+    The model was built using
+    <a target="_blank" href="https://github.com/sbos/AdaGram.jl">AdaGram.jl</a>
+    with alpha = 0.10, window size 5, vector size 300
+    and maximum number of senses 10 on a 2 billion word corpus of Russian
+    lemmatized with MyStem3.
+    The corpus consists RuWac, Russian wikipedia and lib.ru archives.
+</p>
+
+<p>
+    <b>AdaGram sense induction demo:</b> enter any Russian word into
+    the search field, and see induced senses, sense neighours and context words.
+    For example: <a target="_blank" href="{{ reverse_url('senses') }}?word=яблоко">яблоко</a>.
+</p>
+
+<p>
+    <b>Regular polysemy pattern demo:</b> enter a word and its sense numbers
+    (denoted with a # prefix in each sense card), and see what words have
+    similar polysemy, for example:
+    <a target="_blank" href="{{ reverse_url('sim-delta') }}?word=блеять&s1=0&s2=1">блеять</a>.
+</p>
+
+{% end %}

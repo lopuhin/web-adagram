@@ -13,3 +13,9 @@
     margin-left: 1em;
     float: right;
 }
+
+#about {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}

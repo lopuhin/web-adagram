@@ -45,3 +45,8 @@ class SensesHandler(RequestHandler):
         return senses
 
 
+class AboutHandler(RequestHandler):
+    def get(self):
+        self.render('templates/about.html')
+
+

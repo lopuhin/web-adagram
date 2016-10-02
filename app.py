@@ -7,7 +7,7 @@ import adagram
 import tornado.ioloop
 from tornado.web import Application, URLSpec
 
-from senses import SensesHandler
+from senses import SensesHandler, AboutHandler
 from simdelta import SimDeltaHandler
 
 
@@ -27,7 +27,8 @@ def main():
     adagram_model = adagram.VectorModel.load(args.model)
     app = Application(
         [URLSpec(r'/', SensesHandler, name='senses'),
-         URLSpec(r'/sim-delta/', SimDeltaHandler, name='sim-delta'),
+         URLSpec(r'/sim-delta/?', SimDeltaHandler, name='sim-delta'),
+         URLSpec(r'/about/?', AboutHandler, name='about'),
         ],
         debug=args.debug,
         static_prefix='/static/',
