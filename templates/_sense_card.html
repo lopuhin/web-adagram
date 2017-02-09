@@ -1,17 +1,43 @@
 <div class="card sense-card {% if sense['highlight'] %}highlight{% end %}">
     <h5>#{{ sense['idx'] }}
-        <span class="sense-prob">
-                             {{ '{:.2f}'.format(sense['prob']) }}
-                        </span>
+        <span class="sense-prob">{{ '{:.2f}'.format(sense['prob']) }}</span>
     </h5>
-    {{ ', '.join(sense['collocates']) }}
+
+    {% if sense['contexts'] %}
+    <a class="modal-trigger" href="#contexts-{{ sense['idx']}}">
+        <b>Contexts: &hellip;</b>
+    </a>
+
+    <div id="contexts-{{ sense['idx']}}" class="modal">
+        <div class="modal-content">
+            <h4>Sense #{{ sense['idx'] }} contexts</h4>
+            {% for l, w, r in sense['contexts'] %}
+            <p>
+                &hellip; {{ l }} <span style="color: red">{{ w }}</span> {{ r }} &hellip;
+            </p>
+            {% end %}
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">
+                Close
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <b>No contexts</b>
+    {% end %}
+
+    <p>
+        <b>Neighbours:</b>
+        {% raw ', '.join('<em>{}</em>'.format(w) for w in sense['collocates']) %}
+    </p>
+
+    <b>Similar senses:</b>
     <ul class="collection">
         {% for n in sense['neighbors'] %}
         <li class="collection-item">
-            <a href="{{ n['link'] }}">{{ n['word'] }}</a>
-            <span class="closeness">
-                                    {{ '{:.2f}'.format(n['closeness']) }}
-                                </span>
+            <a href="{{ n['link'] }}"><em>{{ n['word'] }}</em></a>
+            <span class="closeness">{{ '{:.2f}'.format(n['closeness']) }}</span>
         </li>
         {% end %}
     </ul>

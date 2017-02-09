@@ -1,6 +1,12 @@
+import gzip
+import re
+from pathlib import Path
 from urllib.parse import urlencode
+from typing import List, Tuple
 
 import adagram
+import numpy as np
+from pymystem3 import Mystem
 from tornado.web import RequestHandler
 
 
@@ -26,6 +32,10 @@ class SensesHandler(RequestHandler):
     def senses(self, vm, word, sense_probs, highlight):
         senses = []
         collocates = dict(vm.word_sense_collocates(word, limit=5))
+        contexts = self.get_contexts(word)
+        context_probs = np.array(
+            [vm.disambiguate(word, context_words(ctx)) for ctx in contexts])
+        top_prob_indices = np.argsort(-context_probs, axis=0)
         for idx, prob in sense_probs:
             neighbours = vm.sense_neighbors(word, idx, max_neighbors=5)
             senses.append({
@@ -40,13 +50,43 @@ class SensesHandler(RequestHandler):
                      'closeness': closeness}
                     for w, s_idx, closeness in neighbours],
                 'collocates': collocates.get(idx, []),
+                'contexts': [join_context_punct(contexts[i])
+                             for i in top_prob_indices[:5, idx]
+                             if context_probs[i, idx] >= 0.9],
             })
         senses.sort(key=lambda s: s['prob'], reverse=True)
         return senses
 
+    def get_contexts(self, word: str) -> List[str]:
+        path = Path('contexts').joinpath('{}.txt.gz'.format(word))
+        if path.exists():
+            with gzip.open(str(path), 'rt') as f:
+                contexts = []
+                for line in f:
+                    left, word, right = line.strip().split('\t')
+                    contexts.append((left, word, right))
+            return contexts
+        else:
+            return []
 
-class AboutHandler(RequestHandler):
-    def get(self):
-        self.render('templates/about.html')
+
+mystem = Mystem()
+Ctx = Tuple[str, str, str],
 
 
+def lemm_words(s: str) -> List[str]:
+    return [w.lower() for w in mystem.lemmatize(s) if re.match('[\w\-]+$', w)]
+
+
+def context_words(ctx: Ctx, window: int=10) -> List[str]:
+    left, _, right = ctx
+    return lemm_words(left)[-window:] + lemm_words(right)[:window]
+
+
+def join_context_punct(ctx: Ctx) -> Ctx:
+    left, word, right = ctx
+    r = right[0]
+    if right[1] == ' ' and not (r.isalpha() or r.isdigit() or r in '(-'):
+        word = '{}{}'.format(word, r)
+        right = right[2:]
+    return left, word, right

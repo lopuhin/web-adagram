@@ -5,9 +5,9 @@ from pathlib import Path
 
 import adagram
 import tornado.ioloop
-from tornado.web import Application, URLSpec
+from tornado.web import Application, RequestHandler, URLSpec
 
-from senses import SensesHandler, AboutHandler
+from senses import SensesHandler
 from simdelta import SimDeltaHandler
 
 
@@ -15,6 +15,11 @@ logging.basicConfig(
     format='[%(levelname)s] %(asctime)s %(message)s', level=logging.INFO)
 ROOT = Path(__file__).parent
 STATIC_ROOT = ROOT / 'static'
+
+
+class AboutHandler(RequestHandler):
+    def get(self):
+        self.render('templates/about.html')
 
 
 def main():
