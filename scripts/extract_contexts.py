@@ -2,13 +2,14 @@
 import argparse
 from datetime import datetime
 import gzip
-import hashlib
 import random
 from pathlib import Path
 from typing import List
 
 from adagram import VectorModel
 from pymystem3 import Mystem
+
+from senses import word_folder, word_path
 
 
 mystem = Mystem()
@@ -57,14 +58,10 @@ def write_contexts(w, contexts: List[str], output: Path, max_contexts: int):
         contexts = random.sample(contexts, max_contexts)
     folder = word_folder(output, w)
     folder.mkdir(exist_ok=True)
-    with gzip.open(str(folder / '{}.txt.gz'.format(w)), 'wt') as f:
+    with gzip.open(str(word_path(output, w)), 'wt') as f:
         for ctx in contexts:
             f.write(ctx)
             f.write('\n')
-
-
-def word_folder(root: Path, word: str) -> Path:
-    return root.joinpath(hashlib.md5(word.encode('utf8')).hexdigest()[:2])
 
 
 def line_contexts_iter(f, words, window_size):

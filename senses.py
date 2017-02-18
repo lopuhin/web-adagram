@@ -1,4 +1,5 @@
 import gzip
+import hashlib
 import re
 from pathlib import Path
 from urllib.parse import urlencode
@@ -58,12 +59,12 @@ class SensesHandler(RequestHandler):
         return senses
 
     def get_contexts(self, word: str) -> List[str]:
-        path = Path('contexts').joinpath('{}.txt.gz'.format(word))
+        path = word_path(Path('contexts'), word)
         if path.exists():
             with gzip.open(str(path), 'rt') as f:
                 contexts = []
                 for line in f:
-                    left, word, right = line.strip().split('\t')
+                    left, word, right = line.strip('\n ').split('\t')
                     contexts.append((left, word, right))
             return contexts
         else:
@@ -90,3 +91,11 @@ def join_context_punct(ctx: Ctx) -> Ctx:
         word = '{}{}'.format(word, r)
         right = right[2:]
     return left, word, right
+
+
+def word_folder(root: Path, word: str) -> Path:
+    return root.joinpath(hashlib.md5(word.encode('utf8')).hexdigest()[:2])
+
+
+def word_path(root: Path, word: str) -> Path:
+    return word_folder(root, word) / '{}.txt.gz'.format(word)
