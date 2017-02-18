@@ -98,4 +98,8 @@ def word_folder(root: Path, word: str) -> Path:
 
 
 def word_path(root: Path, word: str) -> Path:
-    return word_folder(root, word) / '{}.txt.gz'.format(word)
+    if re.match('^[\w-]+$', word):
+        name = word
+    else:
+        name = hashlib.md5(word.encode('utf8')).hexdigest()
+    return word_folder(root, word) / '{}.txt.gz'.format(name)

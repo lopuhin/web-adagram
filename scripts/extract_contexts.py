@@ -35,22 +35,29 @@ def main():
     popular_words = set(words[:500])
     words = set(words)
 
-    contexts_by_w = {w: [] for w in words}
-    with args.corpus.open('rt') as f:
-        for w, ctx in line_contexts_iter(
-                f, words, window_size=args.window):
-            contexts = contexts_by_w[w]
-            contexts.append(ctx)
-            max_contexts = args.max_contexts * (10 if w in popular_words else 2)
-            if len(contexts) >= max_contexts:
-                del contexts_by_w[w]
-                words.remove(w)
-                write_contexts(w, contexts, args.output, args.max_contexts)
-            if not contexts_by_w:
-                break
+    for w in list(words):
+        if word_path(args.output, w).exists():
+            words.remove(w)
+    print('Getting contexts for {} words'.format(len(words)))
 
-    for w, contexts in contexts_by_w.items():
-        write_contexts(w, contexts, args.output, args.max_contexts)
+    contexts_by_w = {w: [] for w in words}
+    try:
+        with args.corpus.open('rt') as f:
+            for w, ctx in line_contexts_iter(
+                    f, words, window_size=args.window):
+                contexts = contexts_by_w[w]
+                contexts.append(ctx)
+                max_contexts = \
+                    args.max_contexts * (10 if w in popular_words else 2)
+                if len(contexts) >= max_contexts:
+                    del contexts_by_w[w]
+                    words.remove(w)
+                    write_contexts(w, contexts, args.output, args.max_contexts)
+                if not contexts_by_w:
+                    break
+    finally:
+        for w, contexts in contexts_by_w.items():
+            write_contexts(w, contexts, args.output, args.max_contexts)
 
 
 def write_contexts(w, contexts: List[str], output: Path, max_contexts: int):
