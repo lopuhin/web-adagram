@@ -7,7 +7,7 @@ import adagram
 import tornado.ioloop
 from tornado.web import Application, RequestHandler, URLSpec
 
-from senses import SensesHandler
+from senses import SensesHandler, mystem
 from simdelta import SimDeltaHandler
 
 
@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--port', type=int, default=8000)
     args = parser.parse_args()
+    mystem.start()
     logging.info('Loading adagram model')
     adagram_model = adagram.VectorModel.load(args.model)
     app = Application(
