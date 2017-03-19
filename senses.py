@@ -64,8 +64,12 @@ class SensesHandler(RequestHandler):
             with gzip.open(str(path), 'rt') as f:
                 contexts = []
                 for line in f:
-                    left, word, right = line.strip('\n ').split('\t')
-                    contexts.append((left, word, right))
+                    try:
+                        left, word, right = line.strip('\n ').split('\t')
+                    except ValueError:
+                        pass
+                    else:
+                        contexts.append((left, word, right))
             return contexts
         else:
             return []
