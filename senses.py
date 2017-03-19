@@ -53,7 +53,8 @@ class SensesHandler(RequestHandler):
                 'collocates': collocates.get(idx, []),
                 'contexts': [join_context_punct(contexts[i])
                              for i in top_prob_indices[:5, idx]
-                             if context_probs[i, idx] >= 0.9],
+                             if context_probs[i, idx] >= 0.9]
+                if contexts else [],
             })
         senses.sort(key=lambda s: s['prob'], reverse=True)
         return senses
