@@ -1,5 +1,5 @@
-Cython==0.24.1
-numpy==1.11.1
+Cython==0.29.22
+numpy==1.20.1
 pymystem3==0.1.5
 six
 tornado==4.4.1
